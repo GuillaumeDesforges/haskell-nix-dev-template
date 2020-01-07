@@ -1,6 +1,6 @@
 {
   # GHC version
-  ghc-version = "ghc865";
+  ghc-version = "ghc864";
 
   # IDEs
   use-ghcide = true;

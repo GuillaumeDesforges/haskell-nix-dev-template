@@ -12,26 +12,19 @@ let
   hie = import ./nix/hie.nix { selector = ghc-selector; };
 
   # Haskell package set with ghcWithPackages changed to always add Hoogle
-  haskellPackages-withHoogle = ((ghc-selector pkgs.haskell.packages).override {
-    overrides = (self: super:
-      {
-        ghc = super.ghc // { withPackages = super.ghc.withHoogle; };
-        ghcWithPackages = self.ghc.withPackages;
-      }
-    );
-  });
+  haskellPackages = ghc-selector pkgs.haskell.packages;
 
   # Project loaded with `callCabal2nix`
-  packages-from-cabal = import ./nix/from-cabal.nix { haskellPackages = pkgs.haskellPackages; };
+  packages-from-cabal = import ./nix/from-cabal.nix { inherit haskellPackages; };
 
 in
   # Environment with Haskell development env
   (
-    pkgs.haskellPackages.shellFor {
+    haskellPackages.shellFor {
       packages = p: packages-from-cabal;
 
       buildInputs = [
-          haskellPackages-withHoogle.cabal-install
+          haskellPackages.cabal-install
       ]
         ++ (pkgs.lib.lists.optionals use-hie [ hie pkgs.cabal-install ])
         ++ (pkgs.lib.lists.optionals use-ghcide [ ghcide ]);
