@@ -1,20 +1,15 @@
-{ useGhcide ? true
-, useHie ? false}:
-
 let
   pkgs = import ./nix/nixpkgs.nix { };
+  config = import ./nix/config.nix;
 
-  # ==========================================================================
-
-  # GHC version selector
-  ghc-selector = p: p.ghc865;
+  # GHC version
+  inherit (config) ghc-version;
+  ghc-selector = p: pkgs.lib.attrsets.getAttr ghc-version p;
 
   # IDEs to chose from
-  # TODO refactor the GHC version choice
-  hie = import ./nix/hie.nix { selector = (p: {inherit (p) ghc865; }); };
-  ghcide = (import ./nix/ghcide.nix).ghcide-ghc865;
-
-  ## =========================================================================
+  inherit (config) use-ghcide use-hie;
+  ghcide = pkgs.lib.attrsets.getAttr ("ghcide-" + ghc-version) (import ./nix/ghcide.nix);
+  hie = import ./nix/hie.nix { selector = ghc-selector; };
 
   # Haskell package set with ghcWithPackages changed to always add Hoogle
   haskellPackages-withHoogle = ((ghc-selector pkgs.haskell.packages).override {
@@ -27,14 +22,30 @@ let
   });
 
   # Project loaded with `callCabal2nix`
-  packages-from-cabal = import ./nix/from-cabal.nix { haskellPackages = haskellPackages-withHoogle; };
+  packages-from-cabal = import ./nix/from-cabal.nix { haskellPackages = pkgs.haskellPackages; };
 
 in
-  # Create Haskell env from projects
-  (haskellPackages-withHoogle.ghcWithHoogle (hp: packages-from-cabal)).env
-  # Overrie the project environment for development
+  # Environment with Haskell development env
+  (
+    pkgs.haskellPackages.shellFor {
+      packages = p: packages-from-cabal;
+
+      buildInputs = [
+          haskellPackages-withHoogle.cabal-install
+      ]
+        ++ (pkgs.lib.lists.optionals use-hie [ hie pkgs.cabal-install ])
+        ++ (pkgs.lib.lists.optionals use-ghcide [ ghcide ]);
+
+      withHoogle = true;
+    }
+  )
+
+  # Some corrections on the shellFor derivation
   .overrideAttrs (oldAttrs:
+
     let
+      # See https://github.com/NixOS/nixpkgs/issues/76837
+      # TODO remove and check after https://github.com/NixOS/nixpkgs/pull/76842 is merged and pinned nixpkgs is changed
       NIX_GHC_DOCDIR =
         let
           # helper functions
@@ -42,22 +53,22 @@ in
           all-but-last = l: reverse (builtins.tail (reverse l));
           # first element is empty string after split, last element is "html" to remove
           split-path = path: all-but-last (builtins.tail (pkgs.lib.strings.splitString "/" path)); 
-          correct-path = path: builtins.map (s: if s == "ghc" then "hoogle" else s) path;
+          ghc-to-hoogle = path: builtins.map (s: if s == "ghc" then "hoogle" else s) path;
           concat-path = path: pkgs.lib.strings.concatMapStrings (s: "/${s}") path;
+          correct-ghc-docdir-path = path: concat-path (ghc-to-hoogle (split-path path));
         in
-          concat-path (correct-path (split-path oldAttrs.NIX_GHC_DOCDIR));
-    in
-      {
-        # Add HIE and required system packages for development
-        buildInputs = oldAttrs.buildInputs 
-          ++ (pkgs.lib.lists.optionals useHie    [ hie pkgs.cabal-install ])
-          ++ (pkgs.lib.lists.optional  useGhcide ghcide);
+          correct-ghc-docdir-path oldAttrs.NIX_GHC_DOCDIR;
 
-        # See https://github.com/NixOS/nixpkgs/issues/76837
-        # TODO remove and check after https://github.com/NixOS/nixpkgs/pull/76842 is merged
-        # inherit NIX_GHC_DOCDIR;
+    in
+      # Correction, see above
+      {
+        inherit NIX_GHC_DOCDIR;
       }
-      // pkgs.lib.attrsets.optionalAttrs useHie {
-        # HIE_HOOGLE_DATABASE = NIX_GHC_DOCDIR + "/default.hoo";
+
+      # Optional attributes for HIE
+      // pkgs.lib.attrsets.optionalAttrs use-hie {
+        # Allows HIE to find the hoogle database properly
+        HIE_HOOGLE_DATABASE = NIX_GHC_DOCDIR + "/default.hoo";
       }
   )
+  

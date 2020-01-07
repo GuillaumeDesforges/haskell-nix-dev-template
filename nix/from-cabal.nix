@@ -14,7 +14,8 @@ let
   
   found-packages = findHaskellPackages ./../packages;
 
-  called-packages = builtins.attrValues (builtins.mapAttrs (name: value: haskellPackages.callPackage value) found-packages);
+  call-cabal-package = name: path: haskellPackages.callCabal2nix name path {};
+  called-packages = builtins.attrValues (builtins.mapAttrs call-cabal-package found-packages);
 
 in
   called-packages

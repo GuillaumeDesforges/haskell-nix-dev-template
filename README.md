@@ -10,6 +10,7 @@ I decided to make once and for all a way for beginners such as myself to start p
 * Use Nix to handle packages (Haskell compiler, development tools).
 * Use Cabal for the Haskell package definition.
 * The development can be started after only a few commands in CLI (3 at most).
+* This is not educational content.
 
 ## Credits
 Huge credits to [https://github.com/fghibellini/nix-haskell-monorepo/](https://github.com/fghibellini/nix-haskell-monorepo/).
