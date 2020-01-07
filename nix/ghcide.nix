@@ -1,0 +1,1 @@
+import (builtins.fetchTarball "https://github.com/hercules-ci/ghcide-nix/tarball/master") { }
