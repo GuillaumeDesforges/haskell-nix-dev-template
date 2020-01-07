@@ -46,17 +46,25 @@ git clone https://github.com/GuillaumeDesforges/haskell-nix-dev-template.git
 cd haskell-nix-dev-template
 ```
 
-2. Start VS Code
+2. Build the environment for the first time
+    * Wait for the build to complete. It can be very long but don't worry, it will work almost instantly next time.
+
+```bash
+nix-shell --run "echo Sucessfully built the environment"
+```
+
+3. Start VS Code
 
 ```bash
 code .
 ```
 
-3. Use `Nix Environment Selector` (bottom left of the VS Code window, in the toolbar) to select `shell.nix` as the environment.
-    * Wait for the build. It can be very long the first time but don't worry, it will work almost instantly next time.
+4. Use `Nix Environment Selector` (bottom left of the VS Code window, in the toolbar) to select `shell.nix` as the environment.
     * Reload the VS Code window when asked (a notification will pop up at the bottom right of the window).
 
-You can now create projects (Cabal packages) in the `./packages` directory.
+5. You can now create projects (Cabal packages) in the `./packages` directory.
+
+Repeat from step (2) when you add, remove or modify a `.cabal` file.
 
 ## Motivations
 
