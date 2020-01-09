@@ -66,6 +66,12 @@ code .
 
 Repeat from step (2) when you add, remove or modify a `.cabal` file.
 
+### Configuration
+
+It is advised to edit only the following specified files (except if you know what you are doing).
+
+* The most basic parameters are in `./nix/config.nix`.
+
 ## Motivations
 
 I found setting up a Haskell project way more complicated than nearly any modern language.
