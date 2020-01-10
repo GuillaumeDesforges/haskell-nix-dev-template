@@ -68,9 +68,13 @@ Repeat from step (2) when you add, remove or modify a `.cabal` file.
 
 ### Configuration
 
-It is advised to edit only the following specified files (except if you know what you are doing).
+Some parameters can be configured by editing the file `./nix/confgi.nix`. 
 
-* The most basic parameters are in `./nix/config.nix`.
+For now you can:
+* Change the GHC version to use
+    * Warning: check that this version is supported by nixpkgs and your IDE
+* Select the IDE used
+    * For now either ghcide (default) or HIE
 
 ## Motivations
 

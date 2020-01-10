@@ -7,9 +7,12 @@ let
   ghc-selector = p: pkgs.lib.attrsets.getAttr ghc-version p;
 
   # IDEs to chose from
-  inherit (config) use-ghcide use-hie;
+  inherit (config) ide;
+  use-ghcide = ide == "ghcide";
+  use-hie = ide == "hie";
+  
   ghcide = pkgs.lib.attrsets.getAttr ("ghcide-" + ghc-version) (import ./nix/ghcide.nix);
-  hie = import ./nix/hie.nix { selector = ghc-selector; };
+  hie = import ./nix/hie.nix { inherit ghc-version; };
 
   # Haskell package set with ghcWithPackages changed to always add Hoogle
   haskellPackages = ghc-selector pkgs.haskell.packages;

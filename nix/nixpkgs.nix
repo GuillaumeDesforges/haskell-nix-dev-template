@@ -1,15 +1,15 @@
+{ usePinnedNixpkgs ? false }:
 # The version of nixpkgs used for this project
 let
   # Either a pinned version
-  get-pinned-nixpkgs = rev: 
+  get-pinned-nixpkgs = ref: rev:
     builtins.fetchGit {
         url = "https://github.com/NixOS/nixpkgs.git";
-        ref = "master";
-        inherit rev;
+        inherit ref rev;
     };
-  # pinned-nixpkgs = get-pinned-nixpkgs "cca0c894a13ec398de8b046174239513197f5c74"
+  pinned-nixpkgs = get-pinned-nixpkgs "master" "cca0c894a13ec398de8b046174239513197f5c74" {};
   
   # Or the current local
-  current-local = import <nixpkgs>;
+  current-local = import <nixpkgs> {};
 in
-  current-local
+  if usePinnedNixpkgs then pinned-nixpkgs else current-local

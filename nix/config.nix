@@ -2,7 +2,6 @@
   # GHC version
   ghc-version = "ghc865";
 
-  # IDEs
-  use-ghcide = true;
-  use-hie = false;
+  # IDEs (either "ghcide" or "hie")
+  ide = "ghcide";
 }
