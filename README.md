@@ -17,7 +17,7 @@ bash <(curl https://nixos.org/nix/install)
 2. Install VS Code and some plugins:
     * `Nix Environment Selector`
     * `Haskell Syntax Highlighting`
-    * Either `ghcide` for ghcide (default) or `Haskell Language Server` for HIE (not working at the moment) 
+    * Either `ghcide` for ghcide (default) or `Haskell Language Server` for HIE (slower but has a bit more tools)
 
 #### Recommanded steps for faster use
 
