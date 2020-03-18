@@ -1,11 +1,16 @@
 let
-  pkgs = import ./nix/nixpkgs.nix { };
+  # Haskell Nix Dev Template config
   config = import ./nix/config.nix;
-
-  # GHC version
-  inherit (config) ghc-version;
-  ghc-selector = p: pkgs.lib.attrsets.getAttr ghc-version p;
-
+  inherit (config) ghc-version use-pinned-nixpkgs pinned-nixpkgs-url pinned-nixpkgs-ref pinned-nixpkgs-rev;
+  
+  # Nixpkgs
+  pkgs = import ./nix/nixpkgs.nix {
+    usePinnedNixpkgs = use-pinned-nixpkgs;
+    pinnedNixpkgsUrl = pinned-nixpkgs-url;
+    pinnedNixpkgsRef = pinned-nixpkgs-ref;
+    pinnedNixpkgsRev = pinned-nixpkgs-rev;
+  };
+  
   # IDEs to chose from
   inherit (config) ide;
   use-ghcide = ide == "ghcide";
@@ -15,7 +20,7 @@ let
   hie = import ./nix/hie.nix { inherit ghc-version; };
 
   # Haskell package set with ghcWithPackages changed to always add Hoogle
-  haskellPackages = ghc-selector pkgs.haskell.packages;
+  haskellPackages = pkgs.lib.attrsets.getAttr ghc-version pkgs.haskell.packages;
 
   # Project loaded with `callCabal2nix`
   packages-from-cabal = import ./nix/from-cabal.nix { inherit haskellPackages; };
