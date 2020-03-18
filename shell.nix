@@ -4,12 +4,21 @@ let
   inherit (config) ghc-version use-pinned-nixpkgs pinned-nixpkgs-url pinned-nixpkgs-ref pinned-nixpkgs-rev;
   
   # Nixpkgs
-  pkgs = import ./nix/nixpkgs.nix {
-    usePinnedNixpkgs = use-pinned-nixpkgs;
-    pinnedNixpkgsUrl = pinned-nixpkgs-url;
-    pinnedNixpkgsRef = pinned-nixpkgs-ref;
-    pinnedNixpkgsRev = pinned-nixpkgs-rev;
-  };
+  pkgs = 
+    import ./nix/nixpkgs.nix {
+      usePinnedNixpkgs = use-pinned-nixpkgs;
+      pinnedNixpkgsUrl = pinned-nixpkgs-url;
+      pinnedNixpkgsRef = pinned-nixpkgs-ref;
+      pinnedNixpkgsRev = pinned-nixpkgs-rev;
+    } {
+      config = {
+        packageOverrides = superpkgs: rec {
+          haskellPackages = (superpkgs.lib.attrsets.getAttr ghc-version superpkgs.haskell.packages).override {
+            overrides = self: super: (import ./nix/extra-deps.nix) super;
+          };
+        };
+      };
+    };
   
   # IDEs to chose from
   inherit (config) ide;
