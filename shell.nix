@@ -13,6 +13,7 @@ let
     } {
       config = {
         packageOverrides = superpkgs: rec {
+          # Haskell GHC version happens here
           haskellPackages = (superpkgs.lib.attrsets.getAttr ghc-version superpkgs.haskell.packages).override {
             overrides = self: super: (import ./nix/extra-deps.nix) super;
           };
@@ -28,11 +29,11 @@ let
   ghcide = pkgs.lib.attrsets.getAttr ("ghcide-" + ghc-version) (import ./nix/ghcide.nix);
   hie = import ./nix/hie.nix { inherit ghc-version; };
 
-  # Haskell package set with ghcWithPackages changed to always add Hoogle
-  haskellPackages = pkgs.lib.attrsets.getAttr ghc-version pkgs.haskell.packages;
+  # Haskell package set with the right version (see override above)
+  haskellPackages = pkgs.haskellPackages;
 
   # Project loaded with `callCabal2nix`
-  packages-from-cabal = import ./nix/from-cabal.nix { inherit haskellPackages; };
+  packages-from-cabal = import ./nix/from-cabal.nix { inherit (haskellPackages) callCabal2nix; };
 
 in
   # Environment with Haskell development env

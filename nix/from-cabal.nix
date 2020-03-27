@@ -1,7 +1,5 @@
-{ haskellPackages }:
+{ callCabal2nix }:
 let
-  pkgs = import ./nixpkgs.nix;
-
   # From https://github.com/fghibellini/nix-haskell-monorepo/blob/master/monorepo-nix-expressions/monorepo/nix/lib/utils.nix
   findHaskellPackages = root:
     let
@@ -14,7 +12,7 @@ let
   
   found-packages = findHaskellPackages ./../packages;
 
-  call-cabal-package = name: path: haskellPackages.callCabal2nix name path {};
+  call-cabal-package = name: path: callCabal2nix name path {};
   called-packages = builtins.attrValues (builtins.mapAttrs call-cabal-package found-packages);
 
 in
