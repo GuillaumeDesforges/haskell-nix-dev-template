@@ -4,12 +4,22 @@ let
   inherit (config) ghc-version use-pinned-nixpkgs pinned-nixpkgs-url pinned-nixpkgs-ref pinned-nixpkgs-rev;
   
   # Nixpkgs
-  pkgs = import ./nix/nixpkgs.nix {
-    usePinnedNixpkgs = use-pinned-nixpkgs;
-    pinnedNixpkgsUrl = pinned-nixpkgs-url;
-    pinnedNixpkgsRef = pinned-nixpkgs-ref;
-    pinnedNixpkgsRev = pinned-nixpkgs-rev;
-  };
+  pkgs = 
+    import ./nix/nixpkgs.nix {
+      usePinnedNixpkgs = use-pinned-nixpkgs;
+      pinnedNixpkgsUrl = pinned-nixpkgs-url;
+      pinnedNixpkgsRef = pinned-nixpkgs-ref;
+      pinnedNixpkgsRev = pinned-nixpkgs-rev;
+    } {
+      config = {
+        packageOverrides = superpkgs: rec {
+          # Haskell GHC version happens here
+          haskellPackages = (superpkgs.lib.attrsets.getAttr ghc-version superpkgs.haskell.packages).override {
+            overrides = self: super: (import ./nix/extra-deps.nix) super;
+          };
+        };
+      };
+    };
   
   # IDEs to chose from
   inherit (config) ide;
@@ -19,11 +29,11 @@ let
   ghcide = pkgs.lib.attrsets.getAttr ("ghcide-" + ghc-version) (import ./nix/ghcide.nix);
   hie = import ./nix/hie.nix { inherit ghc-version; };
 
-  # Haskell package set with ghcWithPackages changed to always add Hoogle
-  haskellPackages = pkgs.lib.attrsets.getAttr ghc-version pkgs.haskell.packages;
+  # Haskell package set with the right version (see override above)
+  haskellPackages = pkgs.haskellPackages;
 
   # Project loaded with `callCabal2nix`
-  packages-from-cabal = import ./nix/from-cabal.nix { inherit haskellPackages; };
+  packages-from-cabal = import ./nix/from-cabal.nix { inherit (haskellPackages) callCabal2nix; };
 
 in
   # Environment with Haskell development env

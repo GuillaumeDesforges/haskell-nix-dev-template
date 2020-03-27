@@ -76,6 +76,18 @@ For now you can:
 * Select the IDE used
     * For now either ghcide (default) or HIE
 
+### Extra dependencies
+
+In some cases, you might need to use Haskell packages that are not on Nixpkgs.
+This goes beyond the scope of this template.
+However here is some information to achieve that:
+
+0. *WARNING*: You need to know how to write Nix expressions and how Haskell packages are built on Nixpkgs
+1. Look [here](https://github.com/fghibellini/nix-haskell-monorepo/tree/master/extra-deps) for a guide on how to write extra dependencies
+2. Write those extra dependencies in the `./nix/extra-deps.nix` file
+
+Note: don't forget to add those dependencies in your `.cabal` file or else it won't be added.
+
 ## Motivations
 
 I found setting up a Haskell project way more complicated than nearly any modern language.
