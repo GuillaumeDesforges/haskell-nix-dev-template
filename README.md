@@ -1,6 +1,23 @@
 # Haskell Nix dev template
 A template for completely reproducile build and development in Haskell using Nix.
 
+## UPDATE: 10/11/2020
+
+Since I have created this project, I have now found ways to make Haskell projects that I find more convenient.
+I think using:
+- stack with Nix support enabled
+- [Haskell Language Server](https://github.com/haskell/haskell-language-server/) (distributed by Nix, see [here](https://haskell4nix.readthedocs.io/nixpkgs-users-guide.html#how-to-install-haskell-language-server))
+- VSCode with Nix Env Selector & (new) Haskell extensions
+
+is now the best way to go for the most seemless Haskell experience (yet).
+I might write about it later.
+
+I am still going to let this repository because:
+- it still works
+- it is just one out of a million ways to setup a Haskell project
+
+**TL;DR: this is outdated but not completly irrelevant**
+
 ## How to use
 
 ### Dependencies
